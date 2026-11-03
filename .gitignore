@@ -1,0 +1,28 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Original Part 1 clone (its history lives at github.com/a-huss20/lachinemearning)
+lachinemearning/
+
+# Part 1: manual downloads and pipeline outputs (data_ingestion.py fetches and
+# regenerates them; Data/ lacks the crash archive so --offline cannot use it)
+Data/
+crash-risk-ingestion/data/
+crash-risk-ingestion/.transcript_tmp/
+
+# Part 2: per-run outputs written by prepare_site.py / predict_site.py /
+# prolog_interface.py (model metrics in output/ are kept)
+hybrid_ai_starter/output/site_record.json
+hybrid_ai_starter/output/site_facts.pl
+hybrid_ai_starter/output/ml_prediction.json
+hybrid_ai_starter/output/ml_prediction_facts.pl
+hybrid_ai_starter/output/hybrid_result.json

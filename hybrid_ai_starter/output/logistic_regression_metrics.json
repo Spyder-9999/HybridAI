@@ -1,0 +1,80 @@
+{
+  "model": "logistic_regression",
+  "target": "any_fsi",
+  "table": "intersection_sites",
+  "features": [
+    "n_points",
+    "point_spread_m",
+    "spread_flag",
+    "entering_aadt",
+    "major_road_aadt",
+    "n_state_roads",
+    "cv_percent",
+    "volume_stale",
+    "has_volume",
+    "ped_crossings_200m",
+    "school_crossings_300m",
+    "dist_school_crossing_m",
+    "dist_cbd_km",
+    "lon",
+    "lat",
+    "resp"
+  ],
+  "training_rows": 507,
+  "test_rows": 170,
+  "cv_accuracy_mean": 0.6133178023684722,
+  "cv_accuracy_std": 0.046858775128983524,
+  "cv_precision_mean": 0.43292945512937486,
+  "cv_precision_std": 0.053883120416720255,
+  "cv_recall_mean": 0.6083778966131907,
+  "cv_recall_std": 0.11019388124225643,
+  "cv_f1_mean": 0.5051534167813237,
+  "cv_f1_std": 0.07275731623408775,
+  "cv_roc_auc_mean": 0.6731713099096881,
+  "cv_roc_auc_std": 0.05341657607029635,
+  "cv_average_precision_mean": 0.5270402354828243,
+  "cv_average_precision_std": 0.0440706747914855,
+  "test_accuracy": 0.5941176470588235,
+  "test_precision": 0.4177215189873418,
+  "test_recall": 0.5892857142857143,
+  "test_f1": 0.4888888888888889,
+  "test_roc_auc": 0.618734335839599,
+  "test_average_precision": 0.43898568125030535,
+  "confusion_matrix": [
+    [
+      68,
+      46
+    ],
+    [
+      23,
+      33
+    ]
+  ],
+  "classification_report": {
+    "no_fsi": {
+      "precision": 0.7472527472527473,
+      "recall": 0.5964912280701754,
+      "f1-score": 0.6634146341463415,
+      "support": 114.0
+    },
+    "any_fsi": {
+      "precision": 0.4177215189873418,
+      "recall": 0.5892857142857143,
+      "f1-score": 0.4888888888888889,
+      "support": 56.0
+    },
+    "accuracy": 0.5941176470588235,
+    "macro avg": {
+      "precision": 0.5824871331200445,
+      "recall": 0.5928884711779449,
+      "f1-score": 0.5761517615176152,
+      "support": 170.0
+    },
+    "weighted avg": {
+      "precision": 0.638701283824143,
+      "recall": 0.5941176470588235,
+      "f1-score": 0.6059238004144748,
+      "support": 170.0
+    }
+  }
+}

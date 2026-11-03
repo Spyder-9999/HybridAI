@@ -1,0 +1,23 @@
+# Shared environment for hybrid_ai_starter and crash-risk-ingestion (Python 3.13).
+# pandas and numpy match crash-risk-ingestion/requirements.txt so its outputs stay
+# reproducible: pandas 3.1 writes segment_sites.segment_id as int instead of float.
+
+# Both projects
+pandas==3.0.2
+numpy==2.4.4
+
+# hybrid_ai_starter
+joblib==1.6.0
+scikit-learn==1.9.1
+xgboost==3.4.1
+
+# crash-risk-ingestion
+geopandas==1.2.0
+shapely==2.1.2
+pyproj==3.7.2
+pyogrio==0.13.0
+pyarrow==25.0.1
+pandera==0.33.1
+requests==2.33.1
+matplotlib==3.10.9
+pytest==9.1.1

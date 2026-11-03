@@ -1,0 +1,80 @@
+{
+  "model": "xgboost",
+  "target": "any_fsi",
+  "table": "intersection_sites",
+  "features": [
+    "n_points",
+    "point_spread_m",
+    "spread_flag",
+    "entering_aadt",
+    "major_road_aadt",
+    "n_state_roads",
+    "cv_percent",
+    "volume_stale",
+    "has_volume",
+    "ped_crossings_200m",
+    "school_crossings_300m",
+    "dist_school_crossing_m",
+    "dist_cbd_km",
+    "lon",
+    "lat",
+    "resp"
+  ],
+  "training_rows": 507,
+  "test_rows": 170,
+  "cv_accuracy_mean": 0.6508444962143274,
+  "cv_accuracy_std": 0.06721993976844896,
+  "cv_precision_mean": 0.4692183798105729,
+  "cv_precision_std": 0.091290997518116,
+  "cv_recall_mean": 0.5053475935828877,
+  "cv_recall_std": 0.1149255797986954,
+  "cv_f1_mean": 0.4851816606541858,
+  "cv_f1_std": 0.09998084226490184,
+  "cv_roc_auc_mean": 0.6480748131229551,
+  "cv_roc_auc_std": 0.06550479304293214,
+  "cv_average_precision_mean": 0.5077598893577175,
+  "cv_average_precision_std": 0.08857096609830545,
+  "test_accuracy": 0.5882352941176471,
+  "test_precision": 0.37037037037037035,
+  "test_recall": 0.35714285714285715,
+  "test_f1": 0.36363636363636365,
+  "test_roc_auc": 0.5754229323308271,
+  "test_average_precision": 0.39363884691552353,
+  "confusion_matrix": [
+    [
+      80,
+      34
+    ],
+    [
+      36,
+      20
+    ]
+  ],
+  "classification_report": {
+    "no_fsi": {
+      "precision": 0.6896551724137931,
+      "recall": 0.7017543859649122,
+      "f1-score": 0.6956521739130435,
+      "support": 114.0
+    },
+    "any_fsi": {
+      "precision": 0.37037037037037035,
+      "recall": 0.35714285714285715,
+      "f1-score": 0.36363636363636365,
+      "support": 56.0
+    },
+    "accuracy": 0.5882352941176471,
+    "macro avg": {
+      "precision": 0.5300127713920817,
+      "recall": 0.5294486215538847,
+      "f1-score": 0.5296442687747036,
+      "support": 170.0
+    },
+    "weighted avg": {
+      "precision": 0.5844790023289008,
+      "recall": 0.5882352941176471,
+      "f1-score": 0.5862822599395489,
+      "support": 170.0
+    }
+  }
+}
