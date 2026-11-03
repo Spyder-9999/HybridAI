@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent
 CSV_FILE = BASE_DIR / "processed" / "intersection_sites.csv"
 RECORD_FILE = BASE_DIR / "output" / "site_record.json"
 
-MODEL_FILE = BASE_DIR / "models" / "logistic_regression.joblib"
+MODEL_FILE = BASE_DIR / "models" / "best_model.joblib"
 
 OUTPUT_DIR = BASE_DIR / "output"
 PREDICTION_FILE = OUTPUT_DIR / "ml_prediction.json"
