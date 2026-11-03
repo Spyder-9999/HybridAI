@@ -1,5 +1,6 @@
-"""Prepare one processed intersection record for the Prolog interface.
+"""
 
+File: prepare_site.py
 Student: dobi0016
 Course: COMP3742/9742 - Artificial Intelligence
 Purpose: Convert one row from intersection_sites.csv into a small JSON record
