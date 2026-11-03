@@ -1,0 +1,11 @@
+# Combined environment for the Hybrid AI system (Artefact 1 + Artefact 2).
+# Install once from the repository root:  pip install -r requirements.txt
+# SWI-Prolog is installed separately (macOS: brew install swi-prolog).
+
+# Artefact 1: data ingestion (crash-risk-ingestion/)
+-r crash-risk-ingestion/requirements.txt
+
+# Artefact 2: ML + Prolog (hybrid_ai_starter/)
+scikit-learn==1.9.1
+joblib==1.6.0
+xgboost==3.4.1
