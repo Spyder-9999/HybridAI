@@ -58,6 +58,7 @@ from collections import Counter
 from pathlib import Path
 
 import joblib
+import numpy as np
 import pandas as pd
 
 import predict_site
@@ -78,6 +79,7 @@ DEFAULT_A1_DIR = BASE_DIR.parent / "crash-risk-ingestion"
 A1_SCRIPT_NAME = "data_ingestion.py"
 A1_OUTPUT = Path("data") / "processed" / "intersection_sites.csv"
 A1_REPORT = Path("data") / "processed" / "run_report.json"
+A1_CONTRACT = Path("docs") / "data_contract.json"
 MODEL_DIR = BASE_DIR / "models"
 # The model train_models.py saves after comparing all candidates.
 BEST_MODEL_FILE = MODEL_DIR / "best_model.joblib"
@@ -154,18 +156,26 @@ def setup_logging() -> None:
 # ---------------------------------------------------------------------------
 # Phase 0: Artefact 1 ingestion (optional)
 # ---------------------------------------------------------------------------
-def required_columns() -> set[str]:
-    """Columns the A2 subsystems read from intersection_sites.csv.
+def required_columns(a1_dir: Path) -> set[str]:
+    """Columns intersection_sites.csv must have for Artefact 2 to run.
 
-    Taken from the teammates' own modules (training features and target,
-    plus the fields prepare_site.py writes as facts), so the check stays
-    in step with them if their feature lists change.
+    The authority is Artefact 1's data contract (docs/data_contract.json),
+    the same file train_models.py selects its features from, plus the
+    fields prepare_site.py writes as Prolog facts. If the contract is not
+    available, only the fact fields and the target are checked.
     """
-    import train_models  # main() is guarded, so importing only reads constants
-    return (set(train_models.FEATURES) | {train_models.TARGET}
-            | {"site_key", "site_desc", "entering_aadt",
+    columns = {"site_key", "site_desc", "entering_aadt",
                "ped_crossings_200m", "school_crossings_300m",
-               "volume_stale", "has_volume"})
+               "volume_stale", "has_volume", "any_fsi"}
+    contract_file = a1_dir / A1_CONTRACT
+    if contract_file.is_file():
+        contract = json.loads(contract_file.read_text(encoding="utf-8"))
+        table = contract.get("tables", {}).get("intersection_sites", {})
+        columns |= {column["name"] for column in table.get("columns", [])}
+    else:
+        log.warning("Data contract not found (%s); checking core columns only",
+                    contract_file)
+    return columns
 
 
 def run_artefact1(a1_dir: Path, offline: bool) -> Path:
@@ -216,7 +226,7 @@ def run_artefact1(a1_dir: Path, offline: bool) -> Path:
     # Schema hand-off check: fail here, with a clear message, rather than
     # partway through training or prediction.
     header = pd.read_csv(a1_csv, nrows=0).columns
-    missing = sorted(required_columns() - set(header))
+    missing = sorted(required_columns(a1_dir) - set(header))
     if missing:
         raise PipelineError(
             "Artefact 1 output is missing columns Artefact 2 needs: "
@@ -358,6 +368,45 @@ def classification_label(predicted_class: int) -> str:
     return "historical_fsi_absent"
 
 
+def model_input(data: pd.DataFrame, model) -> pd.DataFrame:
+    """Build the model's input table from intersection_sites.csv rows.
+
+    The columns are the ones the saved pipeline was trained on
+    (feature_names_in_), so prediction always matches whatever features
+    train_models.py selected, even if that list changes. Numeric columns
+    are coerced to numbers; text columns keep missing values as NaN for
+    the pipeline's own imputers.
+
+    Raises:
+        PipelineError: If the CSV lacks a column the model needs.
+    """
+    names = list(getattr(model, "feature_names_in_", predict_site.FEATURES))
+    missing = [name for name in names if name not in data.columns]
+    if missing:
+        raise PipelineError(
+            "Dataset is missing columns the model was trained on: "
+            + ", ".join(missing))
+    features = data[names].copy()
+    for name in names:
+        if pd.api.types.is_numeric_dtype(features[name]) or \
+                pd.api.types.is_bool_dtype(features[name]):
+            features[name] = pd.to_numeric(features[name], errors="coerce")
+        else:
+            features[name] = features[name].astype("object").where(
+                features[name].notna(), np.nan)
+    return features
+
+
+def predict_rows(data: pd.DataFrame, model) -> tuple[list[int], list[float]]:
+    """Return predicted class and P(any_fsi) for each row of data."""
+    features = model_input(data, model)
+    classes = [int(value) for value in model.predict(features)]
+    positive_index = list(model.classes_).index(1)
+    probabilities = [float(value) for value in
+                     model.predict_proba(features)[:, positive_index]]
+    return classes, probabilities
+
+
 def ml_fact_lines(site_id: str, predicted_class: int,
                   probability: float) -> list[str]:
     """Build the ML facts in the same format as predict_site.py.
@@ -416,8 +465,13 @@ def predict_single_site(site: dict) -> dict:
         The ML result dictionary, also saved to output/ml_prediction.json
         together with output/ml_prediction_facts.pl.
     """
-    features = predict_site.load_features(site["site_key"])
-    predicted_class, probability = predict_site.predict_site(features)
+    data = pd.read_csv(CSV_FILE, encoding="utf-8-sig")
+    row = data[data["site_key"].astype(str).str.strip() == site["site_key"]]
+    if row.empty:
+        raise PipelineError(f"Site {site['site_key']} not found in {CSV_FILE}")
+    classes, probabilities = predict_rows(row.head(1), load_model())
+    predicted_class, probability = classes[0], probabilities[0]
+    # predict_site.py's writer saves ml_prediction.json and the ML facts.
     result = predict_site.save_prediction(site, predicted_class, probability)
     # predict_site.py labels every result "Logistic Regression"; record the
     # model actually loaded so the output stays correct if best_model.joblib
@@ -440,18 +494,9 @@ def prepare_and_predict_all() -> tuple[pd.DataFrame, Path, Path]:
          path of the site facts file, path of the ML facts file).
     """
     data = pd.read_csv(CSV_FILE, encoding="utf-8-sig")
-    features = data[predict_site.FEATURES].copy()
-    for column in predict_site.NUMERIC_FEATURES:
-        features[column] = pd.to_numeric(features[column], errors="coerce")
-    for column in predict_site.CATEGORICAL_FEATURES:
-        features[column] = features[column].where(
-            features[column].notna(), None)
-
     model = load_model()
     model_name = model_description(model)
-    classes = model.predict(features)
-    positive_index = list(model.classes_).index(1)
-    probabilities = model.predict_proba(features)[:, positive_index]
+    classes, probabilities = predict_rows(data, model)
     log.info("ML inference: scored %d sites", len(data))
 
     site_lines, ml_lines, rows = [], [], []
