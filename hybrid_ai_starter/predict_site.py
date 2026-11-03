@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent
 CSV_FILE = BASE_DIR / "processed" / "intersection_sites.csv"
 RECORD_FILE = BASE_DIR / "output" / "site_record.json"
 
-MODEL_FILE = BASE_DIR / "models" / "logistic_regression.joblib"
+MODEL_FILE = BASE_DIR / "models" / "best_model.joblib"
 
 OUTPUT_DIR = BASE_DIR / "output"
 PREDICTION_FILE = OUTPUT_DIR / "ml_prediction.json"
@@ -88,8 +88,8 @@ def load_selected_site():
 # 3. Load the matching CSV row and prepare model features
 # ---------------------------------------------------------
 
-def load_features(site_key):
-    """Find the selected site and prepare its model input."""
+def load_features(site_key, features):
+    """Find the selected site and prepare the model's input columns."""
 
     if not CSV_FILE.is_file():
         raise FileNotFoundError(
@@ -98,7 +98,7 @@ def load_features(site_key):
 
     data = pd.read_csv(CSV_FILE, encoding="utf-8-sig")
 
-    required_columns = ["site_key"] + FEATURES
+    required_columns = ["site_key"] + features
     missing_columns = [
         column for column in required_columns
         if column not in data.columns
@@ -125,28 +125,32 @@ def load_features(site_key):
     # Convert numeric inputs to numbers.
     # Invalid or blank values become NaN and are handled by the
     # imputation steps in the saved model pipeline.
-    for column in NUMERIC_FEATURES:
+    for column in features:
+        if column not in NUMERIC_FEATURES:
+            continue
         row[column] = pd.to_numeric(
             row[column],
             errors="coerce"
         )
 
     # Keep categorical fields as strings while preserving missing values.
-    for column in CATEGORICAL_FEATURES:
+    for column in features:
+        if column in NUMERIC_FEATURES:
+            continue
         row[column] = row[column].where(
             row[column].notna(),
             None
         )
 
-    return row[FEATURES]
+    return row[features]
 
 
 # ---------------------------------------------------------
 # 4. Generate the machine-learning prediction
 # ---------------------------------------------------------
 
-def predict_site(features):
-    """Load the saved model and return its prediction."""
+def load_model():
+    """Load the saved pipeline trained by train_models.py."""
 
     if not MODEL_FILE.is_file():
         raise FileNotFoundError(
@@ -154,7 +158,11 @@ def predict_site(features):
             "Run train_models.py successfully first."
         )
 
-    model = joblib.load(MODEL_FILE)
+    return joblib.load(MODEL_FILE)
+
+
+def predict_site(model, features):
+    """Return the model's class and positive-class probability."""
 
     predicted_class = int(model.predict(features)[0])
 
@@ -253,9 +261,14 @@ def main():
 
     try:
         record = load_selected_site()
-        features = load_features(record["site_key"])
+        model = load_model()
+        # Use the exact columns the pipeline was trained on.
+        features = load_features(
+            record["site_key"],
+            list(model.feature_names_in_)
+        )
 
-        predicted_class, probability = predict_site(features)
+        predicted_class, probability = predict_site(model, features)
 
         result = save_prediction(
             record,
