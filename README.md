@@ -15,7 +15,7 @@ HybridAI/
 │   ├── docs/data_contract.json       # schema snapshot used by Artefact 2
 │   ├── tests/test_pipeline.py
 │   └── README.md                     # full Artefact 1 documentation
-└── hybrid_ai_starter/                # Artefact 2: ML + Prolog
+└── hybrid_ai/                # Artefact 2: ML + Prolog
     ├── prolog_interface.py           # entry point: the full hybrid pipeline
     ├── train_models.py               # trains/compares models, saves best_model.joblib
     ├── prepare_site.py               # turns one site row into JSON + Prolog facts
@@ -24,7 +24,7 @@ HybridAI/
     └── processed/intersection_sites.csv   # copy of Artefact 1's output
 ```
 
-`models/` and `output/` inside `hybrid_ai_starter/` are created when the
+`models/` and `output/` inside `hybrid_ai/` are created when the
 pipeline runs and are not committed.
 
 ## Setup
@@ -44,7 +44,7 @@ environment variable at the executable.
 
 ## Running the hybrid pipeline
 
-Run from `hybrid_ai_starter/`:
+Run from `hybrid_ai/`:
 
 ```bash
 python prolog_interface.py                         # interactive site search
@@ -68,7 +68,7 @@ Each run does the following:
    ML facts. It infers an action, a reason, data-quality issues and contextual
    triggers for each site.
 
-### Outputs (`hybrid_ai_starter/output/`)
+### Outputs (`hybrid_ai/output/`)
 
 | File | Contents |
 |---|---|
