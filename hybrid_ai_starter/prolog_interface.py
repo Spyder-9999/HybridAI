@@ -74,7 +74,7 @@ CSV_FILE = BASE_DIR / "processed" / "intersection_sites.csv"
 PREVIOUS_CSV_FILE = BASE_DIR / "processed" / "intersection_sites.previous.csv"
 
 # Artefact 1 (data ingestion). Default location matches the repository
-# layout, where crash-risk-ingestion/ sits next to hybrid_ai_starter/.
+# layout, where crash-risk-ingestion/ sits next to hybrid_ai/.
 DEFAULT_A1_DIR = BASE_DIR.parent / "crash-risk-ingestion"
 A1_SCRIPT_NAME = "data_ingestion.py"
 A1_OUTPUT = Path("data") / "processed" / "intersection_sites.csv"
