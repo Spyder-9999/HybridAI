@@ -1,9 +1,10 @@
 /*
-    File: crash_risk_rules.pl
-    Student: dobi0016
-    Course: COMP3742/9742 - Artificial Intelligence
+    Student Name: Patrick
+    Student FAN: dobi0016
+    File: prepare_site.py
+    Date: 03-11-2026
 
-    Purpose:
+    Description:
     Combine machine-learning classification facts with symbolic
     reasoning about traffic volume, pedestrian crossings and
     data quality.
