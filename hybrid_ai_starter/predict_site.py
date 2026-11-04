@@ -1,12 +1,13 @@
 """
-File: predict_site.py
-Student: dobi0016
-Course: COMP3742/9742 - Artificial Intelligence
 
-Purpose:
-Load the trained Logistic Regression pipeline, predict the historical
+Student Name: Patrick
+Student FAN: dobi0016
+File: prepare_site.py
+Date: 03-11-2026
+Description: Load the trained Logistic Regression pipeline, predict the historical
 any_fsi class for the selected intersection, and export the prediction
 as JSON and Prolog facts.
+
 """
 
 import json
