@@ -1,10 +1,11 @@
 """
 
+Student Name: Patrick
+Student FAN: dobi0016
 File: prepare_site.py
-Student: dobi0016
-Course: COMP3742/9742 - Artificial Intelligence
-Purpose: Convert one row from intersection_sites.csv into a small JSON record
-         and a Prolog facts file. This is a starter integration, not a safety tool.
+Date: 03-11-2026
+Description: Convert one row from intersection_sites.csv into a small JSON record
+         and a Prolog facts file.
 """
 
 import csv
