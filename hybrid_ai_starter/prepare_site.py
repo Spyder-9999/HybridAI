@@ -284,8 +284,8 @@ def main():
 
     parser = argparse.ArgumentParser(
         description=(
-            "Prepare one intersection for the Python-Prolog "
-            "starter interface."
+            "Prepare one intersection for the hybrid AI "
+            "traffic-risk assessment system."
         )
     )
 
